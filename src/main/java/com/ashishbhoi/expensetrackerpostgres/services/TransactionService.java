@@ -1,17 +1,17 @@
 package com.ashishbhoi.expensetrackerpostgres.services;
 
-import com.ashishbhoi.expensetrackerpostgres.models.Transaction;
+import com.ashishbhoi.expensetrackerpostgres.models.TransactionModel;
 
 import java.util.List;
 
 public interface TransactionService {
-    List<Transaction> fetchAllTransactions(Integer userId, Integer categoryId);
+    List<TransactionModel> fetchAllTransactions(Integer userId, Integer categoryId);
 
-    Transaction fetchTransactionById(Integer userId, Integer categoryId, Integer transactionId);
+    TransactionModel fetchTransactionById(Integer userId, Integer categoryId, Integer transactionId);
 
-    Transaction addTransaction(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate);
+    TransactionModel addTransaction(Integer userId, Integer categoryId, Double amount, String note, Long transactionDate);
 
-    void updateTransaction(Integer userId, Integer categoryId, Integer transactionId, Transaction transaction);
+    void updateTransaction(Integer userId, Integer categoryId, Integer transactionId, TransactionModel transactionModel);
 
     void removeTransaction(Integer userId, Integer categoryId, Integer transactionId);
 }

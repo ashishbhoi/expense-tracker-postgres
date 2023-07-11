@@ -2,18 +2,18 @@ package com.ashishbhoi.expensetrackerpostgres.services;
 
 import com.ashishbhoi.expensetrackerpostgres.exceptions.EtBadRequestException;
 import com.ashishbhoi.expensetrackerpostgres.exceptions.EtResourceNotFoundException;
-import com.ashishbhoi.expensetrackerpostgres.models.Category;
+import com.ashishbhoi.expensetrackerpostgres.models.CategoryModel;
 
 import java.util.List;
 
 public interface CategoryService {
-    List<Category> fetchAllCategories(Integer userId);
+    List<CategoryModel> fetchAllCategories(Integer userId);
 
-    Category fetchCategoryById(Integer userId, Integer categoryId) throws EtResourceNotFoundException;
+    CategoryModel fetchCategoryById(Integer userId, Integer categoryId) throws EtResourceNotFoundException;
 
-    Category addCategory(Integer userId, String title, String description) throws EtBadRequestException;
+    CategoryModel addCategory(Integer userId, String title, String description) throws EtBadRequestException;
 
-    void updateCategory(Integer userId, Integer categoryId, Category category) throws EtBadRequestException;
+    void updateCategory(Integer userId, Integer categoryId, CategoryModel categoryModel) throws EtBadRequestException;
 
     void removeCategoryWithAllTransactions(Integer userId, Integer categoryId) throws EtResourceNotFoundException;
 }

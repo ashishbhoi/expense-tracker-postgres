@@ -1,14 +1,12 @@
 package com.ashishbhoi.expensetrackerpostgres.controllers;
 
-import com.ashishbhoi.expensetrackerpostgres.models.Category;
+import com.ashishbhoi.expensetrackerpostgres.models.CategoryModel;
 import com.ashishbhoi.expensetrackerpostgres.services.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,42 +14,39 @@ import java.util.Map;
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @GetMapping("")
-    public ResponseEntity<List<Map<String, Object>>> getAllCategories(HttpServletRequest request) {
+    public ResponseEntity<List<CategoryModel>> getAllCategories(HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        List<Category> categories = categoryService.fetchAllCategories(userId);
-        List<Map<String, Object>> categoryMapList = new ArrayList<>();
-        for (Category category : categories) {
-            categoryMapList.add(categoryMap(category));
-        }
-        return new ResponseEntity<>(categoryMapList, HttpStatus.OK);
+        List<CategoryModel> categoryModels = categoryService.fetchAllCategories(userId);
+        return new ResponseEntity<>(categoryModels, HttpStatus.OK);
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<Map<String, Object>> getCategoryById(HttpServletRequest request,
-                                                               @PathVariable("categoryId") Integer categoryId) {
+    public ResponseEntity<CategoryModel> getCategoryById(HttpServletRequest request,
+                                                         @PathVariable("categoryId") Integer categoryId) {
         Integer userId = (Integer) request.getAttribute("userId");
-        Category category = categoryService.fetchCategoryById(userId, categoryId);
-        return new ResponseEntity<>(categoryMap(category), HttpStatus.OK);
+        CategoryModel categoryModel = categoryService.fetchCategoryById(userId, categoryId);
+        return new ResponseEntity<>(categoryModel, HttpStatus.OK);
     }
 
     @PostMapping("")
-    public ResponseEntity<Map<String, Object>> addCategory(HttpServletRequest request,
-                                                           @RequestBody Map<String, Object> categoryMap) {
+    public ResponseEntity<CategoryModel> addCategory(HttpServletRequest request,
+                                                     @RequestBody CategoryModel category) {
         Integer userId = (Integer) request.getAttribute("userId");
-        String title = (String) categoryMap.get("title");
-        String description = (String) categoryMap.get("description");
-        Category category = categoryService.addCategory(userId, title, description);
-        return new ResponseEntity<>(categoryMap(category), HttpStatus.CREATED);
+        CategoryModel categoryModel = categoryService.addCategory(userId, category.title(), category.description());
+        return new ResponseEntity<>(categoryModel, HttpStatus.CREATED);
     }
 
     @PutMapping("/{categoryId}")
     public ResponseEntity<Map<String, Boolean>> updateCategory(HttpServletRequest request,
                                                                @PathVariable("categoryId") Integer categoryId,
-                                                               @RequestBody Category category) {
+                                                               @RequestBody CategoryModel category) {
         Integer userId = (Integer) request.getAttribute("userId");
         categoryService.updateCategory(userId, categoryId, category);
         return new ResponseEntity<>(Map.of("success", true), HttpStatus.OK);
@@ -63,10 +58,5 @@ public class CategoryController {
         Integer userId = (Integer) request.getAttribute("userId");
         categoryService.removeCategoryWithAllTransactions(userId, categoryId);
         return new ResponseEntity<>(Map.of("success", true), HttpStatus.OK);
-    }
-
-    private Map<String, Object> categoryMap(Category category) {
-        return Map.of("categoryId", category.getId(), "title", category.getTitle(),
-                "description", category.getDescription());
     }
 }

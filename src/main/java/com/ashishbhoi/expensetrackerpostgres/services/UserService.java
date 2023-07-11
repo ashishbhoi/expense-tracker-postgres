@@ -1,11 +1,11 @@
 package com.ashishbhoi.expensetrackerpostgres.services;
 
 import com.ashishbhoi.expensetrackerpostgres.exceptions.EtAuthException;
-import com.ashishbhoi.expensetrackerpostgres.models.User;
+import com.ashishbhoi.expensetrackerpostgres.models.UserModel;
 
 public interface UserService {
-    User validateUser(String email, String username, String password) throws EtAuthException;
+    UserModel validateUser(String email, String username, String password) throws EtAuthException;
 
-    User registerUser(String firstName, String lastName, String email, String username, String password)
+    UserModel registerUser(String firstName, String lastName, String email, String username, String password)
             throws EtAuthException;
 }

@@ -1,11 +1,10 @@
 package com.ashishbhoi.expensetrackerpostgres.controllers;
 
 import com.ashishbhoi.expensetrackerpostgres.Constants;
-import com.ashishbhoi.expensetrackerpostgres.models.User;
+import com.ashishbhoi.expensetrackerpostgres.models.UserModel;
 import com.ashishbhoi.expensetrackerpostgres.services.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,16 +19,19 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    @Autowired
-    UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, Object> userMap) {
         String email = (String) userMap.get("email");
         String username = (String) userMap.get("username");
         String password = (String) userMap.get("password");
-        User user = userService.validateUser(email, username, password);
-        return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
+        UserModel userModel = userService.validateUser(email, username, password);
+        return new ResponseEntity<>(generateJWTToken(userModel), HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -39,20 +41,20 @@ public class UserController {
         String email = (String) userMap.get("email");
         String username = (String) userMap.get("username");
         String password = (String) userMap.get("password");
-        User user = userService.registerUser(firstName, lastName, email, username, password);
-        return new ResponseEntity<>(generateJWTToken(user), HttpStatus.CREATED);
+        UserModel userModel = userService.registerUser(firstName, lastName, email, username, password);
+        return new ResponseEntity<>(generateJWTToken(userModel), HttpStatus.CREATED);
     }
 
-    private Map<String, String> generateJWTToken(User user) {
+    private Map<String, String> generateJWTToken(UserModel userModel) {
         long timestamp = System.currentTimeMillis();
         String token = Jwts.builder().signWith(SignatureAlgorithm.HS256, Constants.API_SECRET_KEY)
                 .setIssuedAt(new Date(timestamp))
                 .setExpiration(new Date(timestamp + Constants.TOKEN_VALIDITY))
-                .claim("userId", user.getId())
-                .claim("email", user.getEmail())
-                .claim("username", user.getUsername())
-                .claim("firstName", user.getFirstName())
-                .claim("lastName", user.getLastName())
+                .claim("userId", userModel.id())
+                .claim("email", userModel.email())
+                .claim("username", userModel.username())
+                .claim("firstName", userModel.firstName())
+                .claim("lastName", userModel.lastName())
                 .compact();
         Map<String, String> map = new HashMap<>();
         map.put("token", token);

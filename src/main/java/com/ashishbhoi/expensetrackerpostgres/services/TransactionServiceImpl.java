@@ -1,80 +1,94 @@
 package com.ashishbhoi.expensetrackerpostgres.services;
 
+import com.ashishbhoi.expensetrackerpostgres.entities.Category;
+import com.ashishbhoi.expensetrackerpostgres.entities.Transaction;
+import com.ashishbhoi.expensetrackerpostgres.entities.User;
 import com.ashishbhoi.expensetrackerpostgres.exceptions.EtResourceNotFoundException;
-import com.ashishbhoi.expensetrackerpostgres.models.Category;
-import com.ashishbhoi.expensetrackerpostgres.models.Transaction;
-import com.ashishbhoi.expensetrackerpostgres.models.User;
+import com.ashishbhoi.expensetrackerpostgres.models.TransactionModel;
 import com.ashishbhoi.expensetrackerpostgres.repositories.CategoryRepository;
 import com.ashishbhoi.expensetrackerpostgres.repositories.TransactionRepository;
 import com.ashishbhoi.expensetrackerpostgres.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @Transactional
 public class TransactionServiceImpl implements TransactionService {
 
-    @Autowired
-    TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
-    @Autowired
-    CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public TransactionServiceImpl(TransactionRepository transactionRepository, CategoryRepository categoryRepository, UserRepository userRepository) {
+        this.transactionRepository = transactionRepository;
+        this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
+    }
 
     @Override
-    public List<Transaction> fetchAllTransactions(Integer userId, Integer categoryId) {
+    public List<TransactionModel> fetchAllTransactions(Integer userId, Integer categoryId) {
         Category category = categoryRepository.findByUser_IdAndId(userId, categoryId);
         if (category == null) {
             throw new EtResourceNotFoundException("Category not found");
         }
-        return transactionRepository.findByUser_IdAndCategory_Id(userId, categoryId);
+        List<Transaction> transactions = transactionRepository.findByUser_IdAndCategory_Id(userId, categoryId);
+        List<TransactionModel> transactionModels = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            transactionModels.add(new TransactionModel(transaction.getId(), transaction.getAmount(), transaction.getNote(),
+                    transaction.getTransactionDate()));
+        }
+        return transactionModels;
     }
 
     @Override
-    public Transaction fetchTransactionById(Integer userId, Integer categoryId, Integer transactionId) {
+    public TransactionModel fetchTransactionById(Integer userId, Integer categoryId, Integer transactionId) {
         Transaction transaction = transactionRepository
                 .findByUser_IdAndCategory_IdAndId(userId, categoryId, transactionId);
         if (transaction == null) {
             throw new EtResourceNotFoundException("Transaction not found");
         }
-        return transaction;
+        return new TransactionModel(transaction.getId(), transaction.getAmount(), transaction.getNote(),
+                transaction.getTransactionDate());
     }
 
     @Override
-    public Transaction addTransaction(Integer userId, Integer categoryId, Double amount, String note,
-                                      Long transactionDate) {
+    public TransactionModel addTransaction(Integer userId, Integer categoryId, Double amount, String note,
+                                           Long transactionDate) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EtResourceNotFoundException("User not found"));
         Category category = categoryRepository.findByUser_IdAndId(userId, categoryId);
-        return transactionRepository.save(Transaction.builder()
+        Transaction transaction = transactionRepository.save(Transaction.builder()
                 .amount(amount)
                 .note(note)
                 .transactionDate(transactionDate)
                 .category(category)
                 .user(user)
                 .build());
+        return new TransactionModel(transaction.getId(), transaction.getAmount(), transaction.getNote(),
+                transaction.getTransactionDate());
     }
 
     @Override
-    public void updateTransaction(Integer userId, Integer categoryId, Integer transactionId, Transaction transaction) {
+    public void updateTransaction(Integer userId, Integer categoryId, Integer transactionId,
+                                  TransactionModel transactionModel) {
         Transaction oldTransaction = transactionRepository
                 .findByUser_IdAndCategory_IdAndId(userId, categoryId, transactionId);
         if (oldTransaction == null) {
             throw new EtResourceNotFoundException("Transaction not found");
         }
-        if (transaction.getAmount() != null) {
-            oldTransaction.setAmount(transaction.getAmount());
+        if (transactionModel.amount() != null) {
+            oldTransaction.setAmount(transactionModel.amount());
         }
-        if (transaction.getNote() != null) {
-            oldTransaction.setNote(transaction.getNote());
+        if (transactionModel.note() != null) {
+            oldTransaction.setNote(transactionModel.note());
         }
-        if (transaction.getTransactionDate() != null) {
-            oldTransaction.setTransactionDate(transaction.getTransactionDate());
+        if (transactionModel.transactionDate() != null) {
+            oldTransaction.setTransactionDate(transactionModel.transactionDate());
         }
         transactionRepository.save(oldTransaction);
     }

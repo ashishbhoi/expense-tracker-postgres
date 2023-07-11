@@ -1,67 +1,77 @@
 package com.ashishbhoi.expensetrackerpostgres.services;
 
+import com.ashishbhoi.expensetrackerpostgres.entities.Category;
+import com.ashishbhoi.expensetrackerpostgres.entities.User;
 import com.ashishbhoi.expensetrackerpostgres.exceptions.EtBadRequestException;
 import com.ashishbhoi.expensetrackerpostgres.exceptions.EtResourceNotFoundException;
-import com.ashishbhoi.expensetrackerpostgres.models.Category;
-import com.ashishbhoi.expensetrackerpostgres.models.User;
+import com.ashishbhoi.expensetrackerpostgres.models.CategoryModel;
 import com.ashishbhoi.expensetrackerpostgres.repositories.CategoryRepository;
 import com.ashishbhoi.expensetrackerpostgres.repositories.TransactionRepository;
 import com.ashishbhoi.expensetrackerpostgres.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @Transactional
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Override
-    public List<Category> fetchAllCategories(Integer userId) {
-        return categoryRepository.findByUser_Id(userId);
+    public CategoryServiceImpl(CategoryRepository categoryRepository, TransactionRepository transactionRepository, UserRepository userRepository) {
+        this.categoryRepository = categoryRepository;
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Category fetchCategoryById(Integer userId, Integer categoryId) throws EtResourceNotFoundException {
+    public List<CategoryModel> fetchAllCategories(Integer userId) {
+        List<Category> categories = categoryRepository.findByUser_Id(userId);
+        List<CategoryModel> categoryModels = new ArrayList<>();
+        for (Category category : categories) {
+            categoryModels.add(new CategoryModel(category.getId(), category.getTitle(), category.getDescription()));
+        }
+        return categoryModels;
+    }
+
+    @Override
+    public CategoryModel fetchCategoryById(Integer userId, Integer categoryId) throws EtResourceNotFoundException {
         Category category = categoryRepository.findByUser_IdAndId(categoryId, userId);
         if (category == null) {
             throw new EtResourceNotFoundException("Category not found");
         }
-        return category;
+        return new CategoryModel(category.getId(), category.getTitle(), category.getDescription());
     }
 
     @Override
-    public Category addCategory(Integer userId, String title, String description) throws EtBadRequestException {
+    public CategoryModel addCategory(Integer userId, String title, String description) throws EtBadRequestException {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EtResourceNotFoundException("User not found"));
-        return categoryRepository.save(Category.builder()
+        Category category = categoryRepository.save(Category.builder()
                 .title(title)
                 .description(description)
                 .user(user)
                 .build());
+        return new CategoryModel(category.getId(), category.getTitle(), category.getDescription());
     }
 
     @Override
-    public void updateCategory(Integer userId, Integer categoryId, Category category) throws EtBadRequestException {
-        Category oldCategory = categoryRepository.findByUser_IdAndId(categoryId, userId);
+    public void updateCategory(Integer userId, Integer categoryId, CategoryModel categoryModel) throws EtBadRequestException {
+        Category oldCategory = categoryRepository.findByUser_IdAndId(userId, categoryId);
         if (oldCategory == null) {
             throw new EtResourceNotFoundException("Category not found");
         }
-        if (category.getTitle() != null) {
-            oldCategory.setTitle(category.getTitle());
+        if (categoryModel.title() != null) {
+            oldCategory.setTitle(categoryModel.title());
         }
-        if (category.getDescription() != null) {
-            oldCategory.setDescription(category.getDescription());
+        if (categoryModel.description() != null) {
+            oldCategory.setDescription(categoryModel.description());
         }
         categoryRepository.save(oldCategory);
     }
