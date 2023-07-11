@@ -27,7 +27,7 @@
     git clone https://github.com/ashishbhoi/expense-tracker.git
     ```
 
-4. Set Environment variable
+2. Set Environment variable
     ```bash
     export JDBC_URL="jdbc:postgresql://<database-url>:<database-port>/<your-database-name>"
     export API_SECRET_KEY="<your-api-secret-key>"
@@ -36,16 +36,16 @@
     ```
    > api secret key can be any string of your choice.
 
-   > To user other database you need to modiry the `pom.xml` file and add the dependency for the database driver.
+   > To user other database you need to modify the `pom.xml` file and add the dependency for the database driver.
 
    > Then you just need to change the `JDBC_URL` to your database url and `JDBC_USER` and `JDBC_PASS` to your database
    username and password.
 
-5. Run the application
+3. Run the application
     ```bash
-    mvn spring-boot:run
+    gradle bootRun
     ```
-   if you don't have maven installed, you can use the `mvnw` file in the root directory.
+   if you don't have gradle installed, you can use the `gradlew` file in the root directory.
     ```bash
-    ./mvnw spring-boot:run
+    ./gradlew bootRun
     ```
