@@ -1,6 +1,6 @@
 package com.ashishbhoi.expensetrackerpostgres.repositories;
 
-import com.ashishbhoi.expensetrackerpostgres.models.User;
+import com.ashishbhoi.expensetrackerpostgres.entities.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

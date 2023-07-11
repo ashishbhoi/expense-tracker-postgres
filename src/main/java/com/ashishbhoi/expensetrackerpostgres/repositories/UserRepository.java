@@ -1,6 +1,6 @@
 package com.ashishbhoi.expensetrackerpostgres.repositories;
 
-import com.ashishbhoi.expensetrackerpostgres.models.User;
+import com.ashishbhoi.expensetrackerpostgres.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
