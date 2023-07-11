@@ -37,18 +37,18 @@ public class CategoryController {
 
     @PostMapping("")
     public ResponseEntity<CategoryModel> addCategory(HttpServletRequest request,
-                                                     @RequestBody CategoryModel category) {
+                                                     @RequestBody CategoryModel categoryModel) {
         Integer userId = (Integer) request.getAttribute("userId");
-        CategoryModel categoryModel = categoryService.addCategory(userId, category.title(), category.description());
-        return new ResponseEntity<>(categoryModel, HttpStatus.CREATED);
+        CategoryModel newCategoryModel = categoryService.addCategory(userId, categoryModel.title(), categoryModel.description());
+        return new ResponseEntity<>(newCategoryModel, HttpStatus.CREATED);
     }
 
     @PutMapping("/{categoryId}")
     public ResponseEntity<Map<String, Boolean>> updateCategory(HttpServletRequest request,
                                                                @PathVariable("categoryId") Integer categoryId,
-                                                               @RequestBody CategoryModel category) {
+                                                               @RequestBody CategoryModel categoryModel) {
         Integer userId = (Integer) request.getAttribute("userId");
-        categoryService.updateCategory(userId, categoryId, category);
+        categoryService.updateCategory(userId, categoryId, categoryModel);
         return new ResponseEntity<>(Map.of("success", true), HttpStatus.OK);
     }
 

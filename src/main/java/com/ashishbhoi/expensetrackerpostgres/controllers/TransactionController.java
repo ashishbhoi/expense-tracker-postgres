@@ -40,14 +40,11 @@ public class TransactionController {
     @PostMapping("")
     public ResponseEntity<TransactionModel> addTransaction(HttpServletRequest request,
                                                            @PathVariable("categoryId") Integer categoryId,
-                                                           @RequestBody Map<String, Object> transactionMap) {
+                                                           @RequestBody TransactionModel transactionModel) {
         Integer userId = (Integer) request.getAttribute("userId");
-        Double amount = Double.parseDouble(transactionMap.get("amount").toString());
-        String note = (String) transactionMap.get("note");
-        Long transactionDate = Long.parseLong(transactionMap.get("transactionDate").toString());
-        TransactionModel transactionModel = transactionService.addTransaction(userId, categoryId, amount, note,
-                transactionDate);
-        return new ResponseEntity<>(transactionModel, HttpStatus.CREATED);
+        TransactionModel newTransactionModel = transactionService.addTransaction(userId, categoryId,
+                transactionModel.amount(), transactionModel.note(), transactionModel.transactionDate());
+        return new ResponseEntity<>(newTransactionModel, HttpStatus.CREATED);
     }
 
     @PutMapping("/{transactionId}")
