@@ -1,4 +1,4 @@
-package com.ashishbhoi.expensetrackerpostgres.models;
+package com.ashishbhoi.expensetrackerpostgres.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
