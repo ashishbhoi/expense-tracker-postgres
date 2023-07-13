@@ -20,7 +20,8 @@ public class Category {
     @SequenceGenerator(
             name = "category_sequence",
             sequenceName = "category_sequence",
-            allocationSize = 1
+            allocationSize = 10,
+            initialValue = 15
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,

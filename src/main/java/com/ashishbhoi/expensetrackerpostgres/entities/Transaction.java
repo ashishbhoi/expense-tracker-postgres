@@ -19,7 +19,7 @@ public class Transaction {
             name = "transaction_sequence",
             sequenceName = "transaction_sequence",
             allocationSize = 1,
-            initialValue = 1000
+            initialValue = 1001
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
