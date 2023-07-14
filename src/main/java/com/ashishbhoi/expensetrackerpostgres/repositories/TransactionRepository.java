@@ -16,7 +16,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 
     @Modifying
     void deleteByUser_IdAndCategory_IdAndId(Integer userId, Integer categoryId, Integer transactionId);
-
-    @Modifying
-    void deleteAllByUser_IdAndCategory_Id(Integer userId, Integer categoryId);
 }

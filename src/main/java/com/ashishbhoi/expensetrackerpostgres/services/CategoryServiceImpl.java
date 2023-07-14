@@ -6,7 +6,6 @@ import com.ashishbhoi.expensetrackerpostgres.exceptions.EtBadRequestException;
 import com.ashishbhoi.expensetrackerpostgres.exceptions.EtResourceNotFoundException;
 import com.ashishbhoi.expensetrackerpostgres.models.CategoryModel;
 import com.ashishbhoi.expensetrackerpostgres.repositories.CategoryRepository;
-import com.ashishbhoi.expensetrackerpostgres.repositories.TransactionRepository;
 import com.ashishbhoi.expensetrackerpostgres.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +19,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    private final TransactionRepository transactionRepository;
-
     private final UserRepository userRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, TransactionRepository transactionRepository, UserRepository userRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository) {
         this.categoryRepository = categoryRepository;
-        this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
     }
 
@@ -83,7 +79,6 @@ public class CategoryServiceImpl implements CategoryService {
         if (category == null) {
             throw new EtResourceNotFoundException("Category not found");
         }
-        transactionRepository.deleteAllByUser_IdAndCategory_Id(userId, categoryId);
         categoryRepository.deleteByUser_IdAndId(userId, categoryId);
     }
 }

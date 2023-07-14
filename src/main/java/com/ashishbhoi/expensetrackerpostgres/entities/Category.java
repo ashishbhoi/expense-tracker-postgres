@@ -36,6 +36,6 @@ public class Category {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category", orphanRemoval = true)
     private List<Transaction> transactions;
 }
