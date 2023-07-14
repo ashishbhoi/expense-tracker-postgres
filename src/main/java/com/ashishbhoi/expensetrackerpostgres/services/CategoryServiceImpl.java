@@ -1,11 +1,13 @@
 package com.ashishbhoi.expensetrackerpostgres.services;
 
 import com.ashishbhoi.expensetrackerpostgres.entities.Category;
+import com.ashishbhoi.expensetrackerpostgres.entities.Transaction;
 import com.ashishbhoi.expensetrackerpostgres.entities.User;
 import com.ashishbhoi.expensetrackerpostgres.exceptions.EtBadRequestException;
 import com.ashishbhoi.expensetrackerpostgres.exceptions.EtResourceNotFoundException;
 import com.ashishbhoi.expensetrackerpostgres.models.CategoryModel;
 import com.ashishbhoi.expensetrackerpostgres.repositories.CategoryRepository;
+import com.ashishbhoi.expensetrackerpostgres.repositories.TransactionRepository;
 import com.ashishbhoi.expensetrackerpostgres.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +23,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final UserRepository userRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository) {
+    private final TransactionRepository transactionRepository;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,
+                               TransactionRepository transactionRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
@@ -31,7 +37,13 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> categories = categoryRepository.findByUser_Id(userId);
         List<CategoryModel> categoryModels = new ArrayList<>();
         for (Category category : categories) {
-            categoryModels.add(new CategoryModel(category.getId(), category.getTitle(), category.getDescription()));
+            double totalExpenses = 0.0;
+            List<Transaction> transactions = transactionRepository.findByUser_IdAndCategory_Id(userId, category.getId());
+            for (Transaction transaction : transactions) {
+                totalExpenses += transaction.getAmount();
+            }
+            categoryModels.add(new CategoryModel(category.getId(), category.getTitle(), category.getDescription(),
+                    totalExpenses));
         }
         return categoryModels;
     }
@@ -42,7 +54,12 @@ public class CategoryServiceImpl implements CategoryService {
         if (category == null) {
             throw new EtResourceNotFoundException("Category not found");
         }
-        return new CategoryModel(category.getId(), category.getTitle(), category.getDescription());
+        double totalExpenses = 0.0;
+        List<Transaction> transactions = transactionRepository.findByUser_IdAndCategory_Id(userId, category.getId());
+        for (Transaction transaction : transactions) {
+            totalExpenses += transaction.getAmount();
+        }
+        return new CategoryModel(category.getId(), category.getTitle(), category.getDescription(), totalExpenses);
     }
 
     @Override
@@ -54,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .description(description)
                 .user(user)
                 .build());
-        return new CategoryModel(category.getId(), category.getTitle(), category.getDescription());
+        return new CategoryModel(category.getId(), category.getTitle(), category.getDescription(), 0.0);
     }
 
     @Override

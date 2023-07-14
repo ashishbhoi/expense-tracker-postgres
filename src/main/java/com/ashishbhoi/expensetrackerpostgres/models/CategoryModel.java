@@ -1,4 +1,4 @@
 package com.ashishbhoi.expensetrackerpostgres.models;
 
-public record CategoryModel(Integer id, String title, String description) {
+public record CategoryModel(Integer id, String title, String description, Double totalExpenses) {
 }
