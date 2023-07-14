@@ -15,16 +15,15 @@ import java.util.List;
 @Entity
 @Table(name = "categories")
 public class Category {
-    @Column(name = "category_id", updatable = false, nullable = false)
+    @Column(name = "category_id", updatable = false)
     @Id
     @SequenceGenerator(
             name = "category_sequence",
             sequenceName = "category_sequence",
             allocationSize = 10,
-            initialValue = 15
+            initialValue = 5
     )
     @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
             generator = "category_sequence"
     )
     private Integer id;

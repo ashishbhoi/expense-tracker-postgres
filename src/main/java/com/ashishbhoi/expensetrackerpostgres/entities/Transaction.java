@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "transactions")
 public class Transaction {
-    @Column(name = "transaction_id", updatable = false, nullable = false)
+    @Column(name = "transaction_id", updatable = false)
     @Id
     @SequenceGenerator(
             name = "transaction_sequence",
@@ -22,7 +22,6 @@ public class Transaction {
             initialValue = 1001
     )
     @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
             generator = "transaction_sequence"
     )
     private Integer id;

@@ -18,7 +18,7 @@ import java.util.List;
         @UniqueConstraint(name = "unique_username", columnNames = "username")
 })
 public class User {
-    @Column(name = "user_id", updatable = false, nullable = false)
+    @Column(name = "user_id", updatable = false)
     @Id
     @SequenceGenerator(
             name = "user_sequence",
@@ -27,7 +27,6 @@ public class User {
             initialValue = 11
     )
     @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
             generator = "user_sequence"
     )
     private Integer id;
