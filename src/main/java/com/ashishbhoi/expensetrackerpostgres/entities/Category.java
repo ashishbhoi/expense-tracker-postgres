@@ -36,6 +36,6 @@ public class Category {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "category", orphanRemoval = true)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     private List<Transaction> transactions;
 }
