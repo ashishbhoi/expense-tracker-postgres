@@ -36,7 +36,7 @@
     ```
    > api secret key can be any string of your choice.
 
-   > To user other database you need to modify the `pom.xml` file and add the dependency for the database driver.
+   > To user other database you need to modify the `build.gradle` file and add the dependency for the database driver.
 
    > Then you just need to change the `JDBC_URL` to your database url and `JDBC_USER` and `JDBC_PASS` to your database
    username and password.
